@@ -1,0 +1,3 @@
+0.2:
+ * the connection information of the proxy server is now defined from an external file (proxy.lst)
+ * option --config (-c) added in order to define the path to the proxy server config file

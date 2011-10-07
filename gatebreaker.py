@@ -21,16 +21,12 @@
 """
 
 __author__      = 'Caner Candan'
-__version__     = '1.0'
+__version__     = '0.2'
 
 
 ############################
 # gate breaker configuration
 ############################
-
-SERVER_USERNAME = 'root'        ### Please define the SSH username
-SERVER_HOST = '127.0.0.1'       ### Please enter your server ip address used like ssh tunnel
-SERVER_PORT = '443'             ### And now the SSH port
 
 RUN_PATH = './run'
 
@@ -71,19 +67,21 @@ def logger(level_name, filename='gatebreaker.log'):
 import optparse
 
 def parser(parser=optparse.OptionParser()):
-    parser.add_option('-v', '--verbose', choices=LEVELS.keys(), default='info', help='set a verbose level')
-    parser.add_option('-o', '--output', help='give an output filename for logging', default='gatebreaker.log')
+    parser.add_option('-v', '--verbose', choices=LEVELS.keys(), default='info', help='set a verbose level [default: info]')
+    parser.add_option('-o', '--output', help='give an output filename for logging [default: gatebreaker.log]', default='gatebreaker.log')
+
+    parser.add_option('-c', '--config', help='give a file path containing the connection information of the proxy server you want to use [default: proxy.lst]', default='proxy.lst')
 
     parser.add_option('-l', '--list', help='give a file path containing the list of ports you want to use', default='')
     parser.add_option('-p', '--port', help='give a specific port number', default='')
 
-    parser.add_option('-s', '--start', action='store_true', help='start the given port number process or all gate breaker processes', default=False)
-    parser.add_option('-r', '--restart', action='store_true', help='restart the given port number process or all gate breaker processes', default=False)
-    parser.add_option('-k', '--kill', action='store_true', help='kill the given port number process or all gate breaker processes', default=False)
-    parser.add_option('-m', '--monitor', action='store_true', help='check the status for the given port number process or all gate breaker processes', default=False)
-    parser.add_option('-a', '--available', action='store_true', help='give the list of all ports that you can activate from the given list file', default=True)
+    parser.add_option('-s', '--start', action='store_true', help='start the given port number process or all gate breaker processes [default: False]', default=False)
+    parser.add_option('-r', '--restart', action='store_true', help='restart the given port number process or all gate breaker processes [default: False]', default=False)
+    parser.add_option('-k', '--kill', action='store_true', help='kill the given port number process or all gate breaker processes [default: False]', default=False)
+    parser.add_option('-m', '--monitor', action='store_true', help='check the status for the given port number process or all gate breaker processes [default: False]', default=False)
+    parser.add_option('-a', '--available', action='store_true', help='give the list of all ports that you can activate from the given list file [default: True]', default=True)
 
-    parser.add_option('-V', '--version', action='store_true', help='current version', default=False)
+    parser.add_option('-V', '--version', action='store_true', help='current version [default: False]', default=False)
 
     options, args = parser.parse_args()
 
@@ -245,7 +243,8 @@ def applytoall(ports, fct):
 if __name__ == '__main__':
 
     if options.version:
-        logging.info('VERSION: %s', __version__)
+        print 'Version: %s' % __version__
+        sys.exit()
 
     if options.kill:
         if options.port == '':
@@ -261,7 +260,18 @@ if __name__ == '__main__':
             monitor() # with -m and -p PORT
         sys.exit()
 
-    if options.list == '': sys.exit()
+    config = {'USERNAME': 'root',        ### Please define the SSH username
+              'HOST': '127.0.0.1',       ### Please enter your server ip address used like ssh tunnel
+              'PORT': '443',             ### And now the SSH port
+              }
+    try:
+        config = eval(''.join(open(options.config).readlines()))
+    except IOError:
+        pass
+
+    if not options.list:
+        print 'No list file defined ... exit.'
+        sys.exit()
 
     # with -l FILE_PATH
 

@@ -1,0 +1,9 @@
+{
+    'USERNAME': 'root',
+    'HOST': 'localhost',
+    'PORT': '443',
+}
+
+# Local Variables:
+# mode: Python
+# End:
